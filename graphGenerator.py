@@ -1,21 +1,17 @@
 import datetime as dt
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-from random import random, seed
-# Create figure for plotting
-fig = plt.figure("Hi")
-ax = fig.add_subplot(1, 1, 1)
-xs = []
-ys = []
+import thread
+import main
+import time
 
-seed(1)
 
 # This function is called periodically from FuncAnimation
-def animate(i, xs, ys):
-    temp_c = random()*10
+def animate(i, xs, ys,ax):
+    temp_c = next(main.statGenarator())
 
     # Add x and y to lists
-    xs.append(dt.datetime.now().strftime('%H:%M:%S.%f'))
+    xs.append(dt.datetime.now().strftime('%M:%S'))
     ys.append(temp_c)
 
     # Limit x and y lists to 20 items
@@ -28,11 +24,22 @@ def animate(i, xs, ys):
 
     # Format plot
     plt.xticks(rotation=45, ha='right')
+    plt.axhline(50,color='r')
+    plt.ylim(0,100)
+    for i, j in zip(xs, ys):
+        ax.annotate(str(j), xy=(i, j))
     plt.subplots_adjust(bottom=0.30)
-    plt.title('TMP102 Temperature over Time')
-    plt.ylabel('Temperature (deg C)')
+    plt.title('vCPU Usage')
+    plt.ylabel('Percentage Used')
 
+def genGraph():
+    # Set up plot to call animate() function periodically
+    fig = plt.figure("vCPU Usage")
+    ax = fig.add_subplot(1, 1, 1)
+    xs = []
+    ys = []
 
-# Set up plot to call animate() function periodically
-ani = animation.FuncAnimation(fig, animate, fargs=(xs, ys), interval=1000)
-plt.show()
+    ani = animation.FuncAnimation(fig, animate, fargs=(xs, ys,ax), interval=1)
+    plt.show()
+
+genGraph()
